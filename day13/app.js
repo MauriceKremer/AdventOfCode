@@ -16,10 +16,14 @@ class licenseCode {
 
             if (row.indexOf('fold along y')>-1) {
                 this.transposeOverY(parseInt(row.split('=')[1]));
+                this.dotCount();
+
+                
             }
 
             if (row.indexOf('fold along x')>-1) {
                 this.transposeOverX(parseInt(row.split('=')[1]));
+                this.dotCount();
             }
 
         });
@@ -70,23 +74,15 @@ class licenseCode {
     }
 
     transposeOverY(yFold) {
-        for (let i = 0; i < this.coordinates.length; i++) {
-            const coordinate = this.coordinates[i];
-            if (coordinate[1]<yFold) continue;
-            let newY = yFold - (coordinate[1] - yFold);
-            this.coordinates[i] =  [coordinate[0],newY];   
-        }
-        this.dotCount();
+        this.coordinates.map( c => {
+            c[1] = (c[1]<yFold)?c[1]:yFold -(c[1]-yFold);
+        });
     }
 
     transposeOverX(xFold) {
-        for (let i = 0; i < this.coordinates.length; i++) {
-            const coordinate = this.coordinates[i];
-            if (coordinate[0]<xFold) continue;
-            let newX = xFold - (coordinate[0] - xFold);
-            this.coordinates[i] =  [newX,coordinate[1]];   
-        }
-        this.dotCount();
+        this.coordinates.map( c => {
+            c[0] = (c[0]<xFold)?c[0]:xFold -(c[0]-xFold);
+        });
     }
 
 
