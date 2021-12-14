@@ -17,8 +17,6 @@ class licenseCode {
             if (row.indexOf('fold along y')>-1) {
                 this.transposeOverY(parseInt(row.split('=')[1]));
                 this.dotCount();
-
-                
             }
 
             if (row.indexOf('fold along x')>-1) {
