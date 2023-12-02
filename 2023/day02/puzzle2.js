@@ -2,11 +2,11 @@ const fs = require('fs');
 const readline = require('readline');
 
 const samples = [
-    {'input':'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green','id':1,'expect':48},
-    {'input':'Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue','id':2,'expect':12},
-    {'input':'Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red','id':3,'expect':1560},
-    {'input':'Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red','id':4,'expect':630},
-    {'input':'Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green','id':5,'expect':36},
+    {'input':'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green','expect':48},
+    {'input':'Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue','expect':12},
+    {'input':'Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red','expect':1560},
+    {'input':'Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red','expect':630},
+    {'input':'Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green','expect':36},
 ];
 
 function verify() {
@@ -15,7 +15,7 @@ function verify() {
     let verified = true;
     for (let index in samples) {
         const sample = samples[index];
-        const result = parseLine(sample.input).power;
+        const result = parseLine(sample.input);
         const response = 'On Input ' + sample.input + ' got ' + result;
         if (result!=sample.expect) {
             console.log("\x1b[41m" + response +' but expected ' + sample.expect+ '\x1b[0m');
@@ -30,7 +30,6 @@ function parseLine(line){
     
     const result = {};
     const parts = line.split(':');
-    result.gameId = parseInt(parts[0].split(' ')[1]);
     result.red = 0;
     result.blue = 0;
     result.green = 0;
@@ -47,8 +46,7 @@ function parseLine(line){
             if (amount > result[color]) result[color] = amount;
         }
     }
-    result.power = result.red * result.blue * result.green;
-    return result;
+    return result.red * result.blue * result.green;
 
 }
 
@@ -61,8 +59,7 @@ async function onFile() {
       
         sum = 0;
         rl.on('line', (line) => {
-            const gameResult = parseLine(line);
-            sum += gameResult.power;
+            sum += parseLine(line);
         });
       
         await new Promise((res) => rl.once('close', res));
