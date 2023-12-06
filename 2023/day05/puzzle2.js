@@ -39,5 +39,4 @@ for (const block of blocks) {
     }
     seeds = newseeds;
 }
-console.log(seeds);
-console.log(seeds.map(x=>x[0]).reduce((a, b) => Math.min(a, b))); //50855035
+console.log(seeds.map(x=>x[0]).reduce((a, b) => Math.min(a, b)));
