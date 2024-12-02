@@ -29,14 +29,14 @@ func allTrue(arr []bool) bool {
 
 // remove element from array while retaining old array
 // // slice method modifies the original array :-O
-func removeElement(integers []int, s int) []int {
-	result := []int{}
-	for i := 0; i < len(integers); i++ {
-		if i == s {
-			continue
-		}
-		result = append(result, integers[i])
+func removeElement(values []int, index int) []int {
+	if index < 0 || index >= len(values) {
+		return values
 	}
+
+	result := append([]int(nil), values[:index]...) // Copy elements before the index
+	result = append(result, values[index+1:]...)    // Copy elements after the index
+
 	return result
 }
 
