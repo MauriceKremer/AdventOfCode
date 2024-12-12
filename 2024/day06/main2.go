@@ -38,7 +38,6 @@ func main() {
 		lineSplit := strings.Split(line, "")
 		for i := 0; i < len(lineSplit); i++ {
 			if lineSplit[i] == "#" {
-				fmt.Println("row", row, "column", i)
 				blocks = append(blocks, block{row, i})
 			} else if lineSplit[i] == "^" {
 				myGuard = guard{row, i, "up"}
@@ -57,15 +56,54 @@ func main() {
 
 	maxRows := row
 	visited := map[string]struct{}{}
-	fmt.Println(myGuard)
+	myCloneGuard := guard{myGuard.row, myGuard.column, myGuard.direction}
 	for !(outOfBounds(myGuard, maxRows, maxColumns)) {
 		myGuard = move(myGuard, blocks)
 		visited[strconv.Itoa(myGuard.row)+"-"+strconv.Itoa(myGuard.column)] = struct{}{}
-		fmt.Println(myGuard)
 	}
-	fmt.Println("out of bounds", myGuard, maxRows, maxColumns)
 
 	fmt.Println(len(visited) - 1)
+
+	loopBlocks := 0
+	for k, _ := range visited {
+
+		var b []block
+		var cords = strings.Split(k, "-")
+		var row, _ = strconv.Atoi(cords[0])
+		var column, _ = strconv.Atoi(cords[1])
+
+		if myCloneGuard.row == row && myCloneGuard.column == column {
+			continue
+		}
+
+		newBlock := block{row: row, column: column}
+		b = append(blocks, newBlock)
+
+		g := guard{row: myCloneGuard.row, column: myCloneGuard.column, direction: myCloneGuard.direction}
+		if movingInCircles(g, b, maxRows, maxColumns) {
+			loopBlocks += 1
+		}
+
+	}
+	fmt.Println("loopBlocks ", loopBlocks)
+
+}
+
+func movingInCircles(g guard, blocks []block, maxRows int, maxColumns int) bool {
+
+	visited := map[string]struct{}{}
+	for !(outOfBounds(g, maxRows, maxColumns)) {
+		g = move(g, blocks)
+
+		locationKey := strconv.Itoa(g.row) + "-" + strconv.Itoa(g.column) + g.direction
+
+		if _, ok := visited[locationKey]; ok {
+			return true
+		}
+		visited[locationKey] = struct{}{}
+	}
+	return false
+
 }
 
 func outOfBounds(g guard, row int, column int) bool {
@@ -90,7 +128,6 @@ func move(g guard, blocks []block) guard {
 	}
 
 	if collision(nextGuard, blocks) {
-		fmt.Println("collision")
 		if g.direction == "up" {
 			g.direction = "right"
 		} else if g.direction == "down" {
@@ -115,5 +152,3 @@ func collision(g guard, blocks []block) bool {
 	}
 	return false
 }
-
-//low 4730

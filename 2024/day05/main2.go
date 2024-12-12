@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -20,15 +21,12 @@ func main() {
 	readRules := true
 	rulesMap := make(map[int][]int)
 	score := 0
-	var sortedRules []int
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		if readRules {
 			if line == "" {
 				readRules = false
-				sortedRules = topSort(rulesMap)
-				fmt.Println(sortedRules)
 				continue
 			}
 			lineSplit := strings.Split(line, "|")
@@ -45,8 +43,10 @@ func main() {
 			}
 			result := checkRules(values, &rulesMap)
 			if result == 0 {
-				fmt.Println(" retry", values, sortedRules, sortArray(values, sortedRules))
-				result = checkRules(sortArray(values, sortedRules), &rulesMap)
+				fmt.Println(" wrong ", values)
+				values = reorder(values, rulesMap)
+				fmt.Println(" reorder ", values)
+				result = checkRules(values, &rulesMap)
 			} else {
 				result = 0
 			}
@@ -111,67 +111,24 @@ func appendValue(m *map[int][]int, key int, value int) {
 	}
 }
 
-func addAll(arr []int, m map[int]bool) {
-	for _, value := range arr {
-		m[value] = true
-	}
-}
-
-func topSort(graph map[int][]int) []int {
-	var ordering []int
-	visitedKeys := make(map[int]bool)
-
-	for key := range graph {
-		var result []int
-		result = dfs(graph, key, visitedKeys)
-		addAll(result, visitedKeys)
-		ordering = append(result, ordering...)
-	}
-
-	return ordering
-}
-
-func dfs(graph map[int][]int, positionKey int, visitedKeys map[int]bool) []int {
-
-	fmt.Println(positionKey, visitedKeys)
-
-	var result []int
-
-	// if positionKey was parsed then return empty
-	if _, ok := (visitedKeys)[positionKey]; ok {
-		return result
-	}
-
-	// check if this has children
-	if _, ok := (graph)[positionKey]; ok {
-
-		// parse each child
-		valuesInKey := graph[positionKey]
-
-		for _, key := range valuesInKey {
-
-			if _, ok := (visitedKeys)[key]; ok {
-				continue
-			}
-
-			addAll([]int{positionKey}, visitedKeys)
-			childResult := dfs(graph, key, visitedKeys)
-			result = append(childResult, result...)
-			addAll(result, visitedKeys)
+func reorder(line []int, rules map[int][]int) []int {
+	newLine := []int{}
+	for _, num := range line {
+		index := make(map[int]int)
+		for i, n := range newLine {
+			index[n] = i
 		}
-	}
-
-	return append([]int{positionKey}, result...)
-}
-
-func sortArray(toSort []int, order []int) []int {
-	var result []int
-	for _, item := range order {
-		for _, sortVal := range toSort {
-			if sortVal == item {
-				result = append(result, item)
+		newInsertIndex := len(newLine)
+		for _, rule := range rules[num] {
+			if idx, ok := index[rule]; ok {
+				if newInsertIndex > idx {
+					newInsertIndex = idx
+				}
 			}
 		}
+		afterNum := slices.Clone(newLine[newInsertIndex:])
+		newLine = append(newLine[:newInsertIndex], num)
+		newLine = append(newLine, afterNum...)
 	}
-	return result
+	return newLine
 }
