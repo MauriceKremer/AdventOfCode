@@ -36,10 +36,10 @@ func main() {
 			score += totalValue
 		} else {
 			fmt.Println("hmmm what now", len(values)-1)
-			for i := 1; i < len(values)-1; i++ {
+			for i := 1; i < len(values); i++ {
 
 				part1 := append([]int{}, values[:i]...)
-				part2 := append([]int{}, values[i+1:]...)
+				part2 := append([]int{}, values[i:]...)
 				fmt.Println(part1, part2)
 				answers1 := calc(part1, totalValue)
 				answers2 := calc(part2, totalValue)
@@ -103,7 +103,7 @@ func calc(values []int, max int) []int {
 
 func joinNumbers(a int, b int) int {
 	result := a
-	textNum := strconv.Itoa(a)
+	textNum := strconv.Itoa(b)
 	for i := 0; i < len(textNum); i++ {
 		result *= 10
 	}
