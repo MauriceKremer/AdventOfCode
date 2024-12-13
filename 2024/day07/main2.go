@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	readfile, err := os.Open("sample.txt")
+	readfile, err := os.Open("input.txt")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -30,38 +30,9 @@ func main() {
 			values = append(values, i)
 		}
 
-		answers := calc(values, totalValue)
-		fmt.Println(values, totalValue, answers)
+		answers := calc(values)
 		if contains(answers, totalValue) {
 			score += totalValue
-		} else {
-			fmt.Println("hmmm what now", len(values)-1)
-			for i := 1; i < len(values); i++ {
-
-				part1 := append([]int{}, values[:i]...)
-				part2 := append([]int{}, values[i:]...)
-				fmt.Println(part1, part2)
-				answers1 := calc(part1, totalValue)
-				answers2 := calc(part2, totalValue)
-
-				found := false
-				for _, n1 := range answers1 {
-					for _, n2 := range answers2 {
-						fmt.Println("check", joinNumbers(n1, n2))
-						if joinNumbers(n1, n2) == totalValue {
-							fmt.Println("found")
-							found = true
-							score += totalValue
-							break
-						}
-					}
-					if found {
-						break
-					}
-				}
-
-			}
-
 		}
 
 	}
@@ -69,7 +40,7 @@ func main() {
 	fmt.Println(score)
 }
 
-func calc(values []int, max int) []int {
+func calc(values []int) []int {
 
 	if len(values) == 1 {
 		return values
@@ -80,25 +51,23 @@ func calc(values []int, max int) []int {
 	result := []int{}
 
 	if len(values) == 2 {
-		result = []int{val1 + val2, val1 * val2}
+		result := []int{val1 + val2, val1 * val2, joinNumbers(val1, val2)}
+		return result
 	} else {
 		plusResult := []int{val1 + val2}
 		plusResult = append(plusResult, values[2:]...)
 		multiplyResult := []int{val1 * val2}
 		multiplyResult = append(multiplyResult, values[2:]...)
 
-		result = calc(plusResult, max)
-		result = append(result, calc(multiplyResult, max)...)
+		joinResult := []int{joinNumbers(val1, val2)}
+		joinResult = append(joinResult, values[2:]...)
+
+		result = calc(plusResult)
+		result = append(result, calc(multiplyResult)...)
+		result = append(result, calc(joinResult)...)
 	}
 
-	sanitized := []int{}
-	for i := 0; i < len(result); i++ {
-		if result[i] <= max {
-			sanitized = append(sanitized, result[i])
-		}
-	}
-
-	return sanitized
+	return result
 }
 
 func joinNumbers(a int, b int) int {
